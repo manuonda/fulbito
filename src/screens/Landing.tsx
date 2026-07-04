@@ -3,7 +3,7 @@ import { Link, Navigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { authErrorMessage, signInWithGoogle } from '../lib/auth'
 import { consumeReturnTo } from '../lib/returnTo'
-import { ErrorText, btnPrimary, btnSecondary } from '../components/ui'
+import { ErrorText, btnPrimary } from '../components/ui'
 import { isFirebaseConfigured } from '../lib/firebase'
 import trophy from '../assets/trophy.svg'
 
@@ -72,18 +72,6 @@ export default function Landing() {
             <GoogleIcon />
             Continuar con Google
           </button>
-          <Link to="/login" className={btnPrimary}>
-            Iniciar sesión
-          </Link>
-          <Link to="/registro" className={btnSecondary}>
-            Crear cuenta
-          </Link>
-          <Link
-            to="/recuperar"
-            className="mt-1 text-center text-sm font-semibold text-indigo-600 active:text-indigo-800"
-          >
-            ¿Olvidaste tu contraseña?
-          </Link>
         </div>
       </div>
     </div>

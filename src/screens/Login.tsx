@@ -63,12 +63,6 @@ export default function Login() {
           <Link to="/recuperar" className="font-semibold text-indigo-600">
             ¿Olvidaste tu contraseña?
           </Link>
-          <p className="text-gray-500">
-            ¿No tenés cuenta?{' '}
-            <Link to="/registro" className="font-semibold text-indigo-600">
-              Registrate
-            </Link>
-          </p>
         </div>
       </form>
     </div>
