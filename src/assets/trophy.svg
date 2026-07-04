@@ -1,0 +1,31 @@
+<svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gold" x1="70" y1="30" x2="170" y2="170" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FCE28A"/>
+      <stop offset="0.45" stop-color="#F0B429"/>
+      <stop offset="1" stop-color="#B87D0C"/>
+    </linearGradient>
+    <linearGradient id="goldDark" x1="90" y1="150" x2="150" y2="215" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E0A320"/>
+      <stop offset="1" stop-color="#8F5E06"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.42" r="0.55">
+      <stop offset="0" stop-color="#FFF7DE"/>
+      <stop offset="1" stop-color="#FFF7DE" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="120" cy="112" r="102" fill="url(#halo)"/>
+  <ellipse cx="120" cy="212" rx="58" ry="9" fill="#000000" opacity="0.12"/>
+  <!-- asas -->
+  <path d="M62 52c-19 0-30 11-30 27 0 24 22 41 46 44l-4-16c-15-4-26-14-26-28 0-8 5-13 14-13h6l-6-14Z" fill="url(#gold)"/>
+  <path d="M178 52c19 0 30 11 30 27 0 24-22 41-46 44l4-16c15-4 26-14 26-28 0-8-5-13-14-13h-6l6-14Z" fill="url(#gold)"/>
+  <!-- copa -->
+  <path d="M64 34h112c2 26-2 55-13 74-9 16-24 27-43 27s-34-11-43-27C66 89 62 60 64 34Z" fill="url(#gold)"/>
+  <path d="M78 42c-1 20 2 42 10 57 6 12 14 19 24 22-14-1-26-10-33-23-9-17-12-38-11-56h10Z" fill="#FFF3C4" opacity="0.55"/>
+  <!-- estrella -->
+  <path d="m120 62 7.6 15.4 17 2.5-12.3 12 2.9 16.9-15.2-8-15.2 8 2.9-16.9-12.3-12 17-2.5L120 62Z" fill="#8F5E06" opacity="0.85"/>
+  <!-- tallo y base -->
+  <path d="M110 133h20l-4 26h-12l-4-26Z" fill="url(#goldDark)"/>
+  <path d="M96 168c0-6 11-9 24-9s24 3 24 9v8H96v-8Z" fill="url(#gold)"/>
+  <path d="M84 186c0-7 16-10 36-10s36 3 36 10v14H84v-14Z" fill="url(#goldDark)"/>
+</svg>

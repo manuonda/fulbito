@@ -1,0 +1,91 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userEmail() {
+      return request.auth.token.email.lower();
+    }
+
+    function isAdmin() {
+      return isSignedIn() && userEmail() == 'manuonda@gmail.com';
+    }
+
+    function isAllowed() {
+      return isSignedIn() && (
+        isAdmin() ||
+        (exists(/databases/$(db)/documents/config/allowlist) &&
+         userEmail() in get(/databases/$(db)/documents/config/allowlist).data.emails)
+      );
+    }
+
+    // Allowlist: cualquier usuario logueado puede leerla (para saber si está
+    // habilitado); solo el admin la modifica.
+    match /config/allowlist {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Perfiles: cada usuario escribe solo el suyo.
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && request.auth.uid == uid;
+      allow delete: if false;
+    }
+
+    // Índice de usernames únicos: se puede leer sin login (chequeo de
+    // disponibilidad en el registro) y solo crear con el propio uid.
+    // "create" ya implica que el doc no existe, así no se pisa uno ajeno.
+    match /usernames/{usernameLower} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid']);
+      allow update, delete: if false;
+    }
+
+    match /tournaments/{tid} {
+      allow read: if isAllowed();
+      allow create, delete: if isAdmin();
+      // El admin edita todo (incluido sacar a alguien de members); un usuario
+      // habilitado solo puede sumarse a sí mismo (al entrar por el link).
+      allow update: if isAdmin() || (
+        isAllowed()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members'])
+        && request.resource.data.members.hasAll(resource.data.members)
+        && request.resource.data.members.removeAll(resource.data.members).hasOnly([request.auth.uid])
+      );
+
+      match /matches/{mid} {
+        allow read: if isAllowed();
+        allow write: if isAdmin();
+
+        // Cada usuario escribe solo SU predicción y solo antes del kickoff.
+        match /predictions/{uid} {
+          allow read: if isAllowed();
+          allow create, update: if isAllowed()
+            && request.auth.uid == uid
+            && request.resource.data.uid == uid
+            && request.resource.data.tournamentId == tid
+            && request.resource.data.matchId == mid
+            && request.resource.data.scoreA is int
+            && request.resource.data.scoreB is int
+            && request.resource.data.scoreA >= 0
+            && request.resource.data.scoreB >= 0
+            && request.time < get(/databases/$(db)/documents/tournaments/$(tid)/matches/$(mid)).data.kickoff;
+          // Solo el admin puede borrar un pronóstico puntual (limpieza manual).
+          allow delete: if isAdmin();
+        }
+      }
+    }
+
+    // Lectura por collection group (ranking del torneo).
+    match /{path=**}/predictions/{uid} {
+      allow read: if isAllowed();
+    }
+  }
+}
