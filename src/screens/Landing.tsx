@@ -47,7 +47,7 @@ export default function Landing() {
   return (
     <div className="flex min-h-dvh flex-col">
       {/* Hero */}
-      <div className="relative isolate flex flex-1 flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#2a1470] via-indigo-700 to-violet-700 px-6 pb-16 pt-14 text-white">
+      <div className="relative isolate flex flex-1 flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-indigo-950 via-indigo-800 to-indigo-600 px-6 pb-16 pt-14 text-white">
         {/* Messi de fondo, semi-transparente, detrás de todo el contenido */}
         <img
           src={messiHero}
@@ -58,7 +58,7 @@ export default function Landing() {
 
         {/* Fondo: aura + acentos decorativos */}
         <div className="pointer-events-none absolute -top-20 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-white/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 -left-10 h-56 w-56 rounded-full bg-violet-400/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-16 -left-10 h-56 w-56 rounded-full bg-blue-400/20 blur-3xl" />
         <div className="pointer-events-none absolute top-10 right-2 h-1.5 w-1.5 rounded-full bg-amber-300/80" />
         <div className="pointer-events-none absolute top-24 right-10 h-1 w-1 rounded-full bg-amber-200/70" />
         <div className="pointer-events-none absolute bottom-28 left-6 h-1 w-1 rounded-full bg-amber-200/60" />
