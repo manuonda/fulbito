@@ -57,7 +57,10 @@ export default function TournamentRanking() {
 
   const isMember = !!user && tournament.members.includes(user.uid)
   const isPublished = tournament.published ?? true
-  const accumulated = tournament.porotosPerMember * tournament.members.length
+  // Solo cuentan los integrantes habilitados (ranking ya excluye
+  // deshabilitados/eliminados); mientras carga se usa 0 para no mostrar un
+  // número inflado con gente que no cuenta.
+  const accumulated = tournament.porotosPerMember * (ranking?.length ?? 0)
 
   async function handleShare() {
     const text = `⚽ Sumate a "${tournament!.name}" en fulbito: ${location.origin}/torneo/${tid}`
@@ -162,9 +165,6 @@ export default function TournamentRanking() {
                       </span>
                       {isOrganizer && (
                         <span className="text-sm font-medium text-indigo-600">Organizador</span>
-                      )}
-                      {entry.disabled && (
-                        <span className="block text-xs font-bold text-amber-600">Deshabilitado</span>
                       )}
                     </span>
                     <span className="text-lg font-black">{entry.points}</span>
