@@ -6,6 +6,7 @@ import { consumeReturnTo } from '../lib/returnTo'
 import { ErrorText } from '../components/ui'
 import { isFirebaseConfigured } from '../lib/firebase'
 import trophy from '../assets/trophy-cup.webp'
+import messiHero from '../assets/messi-hero.webp'
 
 function GoogleIcon() {
   return (
@@ -17,6 +18,12 @@ function GoogleIcon() {
     </svg>
   )
 }
+
+const FEATURES = [
+  { icon: '⚽', label: 'Pronosticá\ncada partido' },
+  { icon: '🫘', label: 'Sumá\nporotos' },
+  { icon: '🏆', label: 'Ganale\na tus amigos' },
+]
 
 export default function Landing() {
   const status = useAuthStore((s) => s.status)
@@ -40,12 +47,33 @@ export default function Landing() {
   return (
     <div className="flex min-h-dvh flex-col">
       {/* Hero */}
-      <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-indigo-700 via-indigo-600 to-violet-700 px-6 pb-16 pt-14 text-white">
-        <div className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-white/10 blur-3xl" />
-        <img src={trophy} alt="Copa fulbito" className="h-48 w-auto drop-shadow-2xl" />
-        <h1 className="mt-4 text-5xl font-black lowercase tracking-tight">fulbito</h1>
-        <p className="mt-2 rounded-full bg-white/15 px-4 py-1.5 text-sm font-semibold tracking-wide">
-          ⚽ Torneo Mundial 2026
+      <div className="relative isolate flex flex-1 flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#2a1470] via-indigo-700 to-violet-700 px-6 pb-16 pt-14 text-white">
+        {/* Messi de fondo, semi-transparente, detrás de todo el contenido */}
+        <img
+          src={messiHero}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-[85%_top] opacity-20"
+        />
+
+        {/* Fondo: aura + acentos decorativos */}
+        <div className="pointer-events-none absolute -top-20 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-white/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-16 -left-10 h-56 w-56 rounded-full bg-violet-400/20 blur-3xl" />
+        <div className="pointer-events-none absolute top-10 right-2 h-1.5 w-1.5 rounded-full bg-amber-300/80" />
+        <div className="pointer-events-none absolute top-24 right-10 h-1 w-1 rounded-full bg-amber-200/70" />
+        <div className="pointer-events-none absolute bottom-28 left-6 h-1 w-1 rounded-full bg-amber-200/60" />
+
+        {/* Copa con aura dorada */}
+        <div className="relative flex items-end justify-center">
+          <div className="pointer-events-none absolute inset-x-0 bottom-4 top-6 rounded-full bg-amber-400/25 blur-2xl" />
+          <img src={trophy} alt="Copa fulbito" className="relative h-52 w-auto drop-shadow-2xl" />
+        </div>
+
+        <h1 className="mt-3 bg-gradient-to-b from-amber-200 to-amber-400 bg-clip-text text-6xl font-black lowercase tracking-tight text-transparent drop-shadow-sm">
+          fulbito
+        </h1>
+        <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-4 py-1.5 text-sm font-semibold tracking-wide ring-1 ring-white/20 backdrop-blur-sm">
+          🌎 Torneo Mundial 2026
         </p>
         <p className="mt-4 max-w-xs text-center text-sm text-indigo-100">
           Pronosticá los partidos, sumá porotos y ganale el torneo a tus amigos.
@@ -53,7 +81,20 @@ export default function Landing() {
       </div>
 
       {/* Acciones */}
-      <div className="-mt-6 rounded-t-3xl bg-white px-6 pb-10 pt-8 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]">
+      <div className="-mt-6 rounded-t-3xl bg-white px-6 pb-10 pt-7 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]">
+        <div className="mb-6 grid grid-cols-3 gap-2">
+          {FEATURES.map((f) => (
+            <div key={f.label} className="flex flex-col items-center gap-1.5 text-center">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-xl">
+                {f.icon}
+              </span>
+              <span className="whitespace-pre-line text-xs font-semibold leading-tight text-gray-600">
+                {f.label}
+              </span>
+            </div>
+          ))}
+        </div>
+
         <div className="flex flex-col gap-3">
           {!isFirebaseConfigured && (
             <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
@@ -66,10 +107,10 @@ export default function Landing() {
             type="button"
             onClick={handleGoogle}
             disabled={busy || !isFirebaseConfigured}
-            className="flex w-full items-center justify-center gap-3 rounded-2xl border border-gray-300 bg-white px-4 py-3.5 text-base font-bold text-gray-800 transition active:bg-gray-50 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-3 rounded-2xl border border-gray-300 bg-white px-4 py-3.5 text-base font-bold text-gray-800 shadow-sm transition active:scale-[0.99] active:bg-gray-50 disabled:opacity-50"
           >
             <GoogleIcon />
-            Continuar con Google
+            {busy ? 'Entrando…' : 'Continuar con Google'}
           </button>
         </div>
       </div>
