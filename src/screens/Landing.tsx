@@ -19,10 +19,10 @@ function GoogleIcon() {
   )
 }
 
-const FEATURES = [
-  { icon: '⚽', label: 'Pronosticá\ncada partido' },
-  { icon: '🫘', label: 'Sumá\nporotos' },
-  { icon: '🏆', label: 'Ganale\na tus amigos' },
+const PITCH_LINES = [
+  { icon: '⚽', text: 'Pronosticá cada partido y pegale.' },
+  { icon: '🫘', text: 'Sumá porotos, no bichos.' },
+  { icon: '👑', text: 'Hacé morder el polvo a tus rivales.' },
 ]
 
 export default function Landing() {
@@ -75,22 +75,17 @@ export default function Landing() {
         <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-4 py-1.5 text-sm font-semibold tracking-wide ring-1 ring-white/20 backdrop-blur-sm">
           🌎 Torneo Mundial 2026
         </p>
-        <p className="mt-4 max-w-xs text-center text-sm text-indigo-100">
-          Pronosticá los partidos, sumá porotos y ganale el torneo a tus amigos.
-        </p>
       </div>
 
       {/* Acciones */}
       <div className="-mt-6 rounded-t-3xl bg-white px-6 pb-10 pt-7 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]">
-        <div className="mb-6 grid grid-cols-3 gap-2">
-          {FEATURES.map((f) => (
-            <div key={f.label} className="flex flex-col items-center gap-1.5 text-center">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-xl">
-                {f.icon}
+        <div className="mb-6 flex flex-col gap-3">
+          {PITCH_LINES.map((l) => (
+            <div key={l.text} className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-lg">
+                {l.icon}
               </span>
-              <span className="whitespace-pre-line text-xs font-semibold leading-tight text-gray-600">
-                {f.label}
-              </span>
+              <p className="text-sm font-semibold leading-snug text-gray-700">{l.text}</p>
             </div>
           ))}
         </div>
