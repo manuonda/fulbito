@@ -6,7 +6,7 @@ import { useMatches } from '../hooks/useMatches'
 import { usePredictionsByMatch, useTournamentPredictions } from '../hooks/usePredictions'
 import { useUsersMap, userLabel } from '../hooks/useUsers'
 import { matchPoints } from '../lib/scoring'
-import { deletePrediction, removeMember } from '../lib/db'
+import { deletePrediction, removePlayer } from '../lib/db'
 import { dayLabel, isLocked, timeLabel } from '../lib/format'
 import { PHASE_LABELS } from '../types/models'
 import { EmptyState, Flag, FullLoader, TopBar } from '../components/ui'
@@ -46,11 +46,11 @@ export default function ParticipantDetail() {
     const label = userLabel(puid, users)
     if (
       !confirm(
-        `¿Quitar a ${label} del torneo? Deja de aparecer en el ranking (sus pronósticos quedan guardados por si lo volvés a sumar).`,
+        `¿Eliminar a ${label} del torneo? Deja de contar en el ranking (sus pronósticos quedan guardados por si lo volvés a habilitar desde Gestionar jugadores).`,
       )
     )
       return
-    await removeMember(tid, puid)
+    await removePlayer(tid, puid)
     navigate(`/torneo/${tid}`, { replace: true })
   }
 
@@ -73,7 +73,7 @@ export default function ParticipantDetail() {
             onClick={handleRemoveMember}
             className="mt-3 rounded-full bg-red-50 px-4 py-1.5 text-xs font-bold text-red-600 active:bg-red-100"
           >
-            Quitar del torneo
+            Eliminar del torneo
           </button>
         )}
       </div>

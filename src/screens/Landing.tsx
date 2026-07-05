@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { authErrorMessage, signInWithGoogle } from '../lib/auth'
 import { consumeReturnTo } from '../lib/returnTo'
-import { ErrorText, btnPrimary } from '../components/ui'
+import { ErrorText } from '../components/ui'
 import { isFirebaseConfigured } from '../lib/firebase'
 import trophy from '../assets/trophy.svg'
 
@@ -24,7 +24,6 @@ export default function Landing() {
   const [busy, setBusy] = useState(false)
 
   if (status === 'ready') return <Navigate to={consumeReturnTo('/home')} replace />
-  if (status === 'waiting') return <Navigate to="/esperando" replace />
 
   async function handleGoogle() {
     setError('')

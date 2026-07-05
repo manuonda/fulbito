@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from 'react'
-import { useAuthStore } from '../store/authStore'
+import { useAllowlist } from '../hooks/useAllowlist'
 import { addAllowedEmail, removeAllowedEmail } from '../lib/db'
 import { EmptyState, ErrorText, TopBar, btnPrimary, inputBase } from '../components/ui'
 
 export default function AdminAllowlist() {
-  const allowlist = useAuthStore((s) => s.allowlist)
+  const allowlist = useAllowlist()
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -24,18 +24,18 @@ export default function AdminAllowlist() {
   }
 
   async function handleRemove(target: string) {
-    if (!confirm(`¿Quitar a ${target}? No va a poder entrar hasta que lo vuelvas a habilitar.`))
-      return
+    if (!confirm(`¿Quitar a ${target} de esta lista?`)) return
     await removeAllowedEmail(target)
   }
 
   return (
     <div className="min-h-dvh bg-white pb-10">
-      <TopBar title="Habilitar jugadores" backTo="/home" />
+      <TopBar title="Lista de emails (opcional)" backTo="/home" />
       <div className="flex flex-col gap-4 px-5 pt-4">
         <p className="text-sm text-gray-500">
-          Solo los emails de esta lista pueden entrar a jugar. Agregá el Gmail (o email) con el que
-          se registra cada amigo.
+          Ahora cualquiera con cuenta de Google puede entrar y sumarse a un torneo abriendo su link;
+          esta lista ya no bloquea el acceso. Para habilitar, pausar o sacar gente de un torneo
+          puntual, entrá al torneo → <strong>Gestionar jugadores</strong>.
         </p>
         <form onSubmit={handleAdd} className="flex gap-2">
           <input

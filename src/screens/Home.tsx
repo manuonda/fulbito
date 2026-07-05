@@ -31,18 +31,12 @@ export default function Home() {
       </header>
 
       {isAdmin && (
-        <div className="flex gap-2 px-5 pt-4">
+        <div className="px-5 pt-4">
           <Link
             to="/admin/crear-torneo"
-            className="flex-1 rounded-2xl bg-indigo-600 px-4 py-3 text-center text-sm font-bold text-white active:bg-indigo-700"
+            className="block rounded-2xl bg-indigo-600 px-4 py-3 text-center text-sm font-bold text-white active:bg-indigo-700"
           >
             Crear nuevo torneo
-          </Link>
-          <Link
-            to="/admin/invitaciones"
-            className="flex-1 rounded-2xl bg-indigo-50 px-4 py-3 text-center text-sm font-bold text-indigo-600 active:bg-indigo-100"
-          >
-            Habilitar jugadores
           </Link>
         </div>
       )}

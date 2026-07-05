@@ -170,6 +170,11 @@ export default function CompleteResults() {
 
   if (!tournament || matches === null || predictions === null) return <FullLoader />
 
+  const canPlay =
+    !!user &&
+    !(tournament.disabledUids ?? []).includes(user.uid) &&
+    !(tournament.removedUids ?? []).includes(user.uid)
+
   const list = tab === 'proximos' ? upcoming : finished
   const groups: { day: string; items: Match[] }[] = []
   for (const m of list) {
@@ -207,6 +212,13 @@ export default function CompleteResults() {
         </p>
       )}
 
+      {!canPlay && (
+        <p className="mx-4 mt-3 rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+          El organizador te deshabilitó en este torneo. Podés ver tus pronósticos guardados, pero no
+          cargar ni editar nuevos hasta que te vuelva a habilitar.
+        </p>
+      )}
+
       {groups.length === 0 && (
         <EmptyState
           icon={tab === 'proximos' ? '📅' : '🏁'}
@@ -221,7 +233,7 @@ export default function CompleteResults() {
           <div className="flex flex-col gap-4">
             {group.items.map((m) => {
               const pred = myPred(m)
-              const locked = isLocked(m.kickoff, now)
+              const locked = isLocked(m.kickoff, now) || !canPlay
 
               if (tab === 'finalizados' && m.official) {
                 const points = pred ? matchPoints(pred, m.official) : null

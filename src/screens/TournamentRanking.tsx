@@ -6,7 +6,7 @@ import { useMatches } from '../hooks/useMatches'
 import { useTournamentPredictions } from '../hooks/usePredictions'
 import { useUsersMap, userLabel } from '../hooks/useUsers'
 import { buildRanking, computeTotals } from '../lib/scoring'
-import { joinTournament } from '../lib/db'
+import { joinTournament, reactivateFromRemoved } from '../lib/db'
 import { EmptyState, FullLoader, TopBar, btnPrimary, btnSecondary, fmt } from '../components/ui'
 import trophy from '../assets/trophy.svg'
 
@@ -22,15 +22,25 @@ export default function TournamentRanking() {
 
   const ranking = useMemo(() => {
     if (!tournament || !matches || !predictions) return null
-    return buildRanking(tournament.members, computeTotals(matches, predictions))
+    return buildRanking(
+      tournament.members,
+      computeTotals(matches, predictions),
+      tournament.disabledUids ?? [],
+      tournament.removedUids ?? [],
+    )
   }, [tournament, matches, predictions])
 
-  // Cualquiera que llegue por el link (ya logueado y habilitado) se suma solo,
-  // sin tener que tocar un botón aparte.
+  // Cualquiera que abre el link se suma solo, ya habilitado. Si había sido
+  // eliminado y vuelve a entrar, reaparece deshabilitado (no se auto-habilita).
   useEffect(() => {
     if (!user || !tid || !tournament) return
-    if (tournament.members.includes(user.uid)) return
-    joinTournament(tid, user.uid).catch(() => {})
+    const isMember = tournament.members.includes(user.uid)
+    const isRemoved = (tournament.removedUids ?? []).includes(user.uid)
+    if (!isMember) {
+      joinTournament(tid, user.uid).catch(() => {})
+    } else if (isRemoved) {
+      reactivateFromRemoved(tid, user.uid).catch(() => {})
+    }
   }, [user, tid, tournament])
 
   if (tournament === undefined) return <FullLoader />
@@ -136,6 +146,9 @@ export default function TournamentRanking() {
                       {isOrganizer && (
                         <span className="text-sm font-medium text-indigo-600">Organizador</span>
                       )}
+                      {entry.disabled && (
+                        <span className="block text-xs font-bold text-amber-600">Deshabilitado</span>
+                      )}
                     </span>
                     <span className="text-lg font-black">{entry.points}</span>
                     <span className="text-gray-300">
@@ -159,6 +172,9 @@ export default function TournamentRanking() {
             </button>
             <Link to={`/torneo/${tid}/partidos`} className={btnSecondary}>
               Gestionar partidos
+            </Link>
+            <Link to={`/torneo/${tid}/jugadores`} className={btnSecondary}>
+              Gestionar jugadores
             </Link>
           </>
         )}

@@ -13,7 +13,6 @@ export default function Login() {
   const [busy, setBusy] = useState(false)
 
   if (status === 'ready') return <Navigate to={consumeReturnTo('/home')} replace />
-  if (status === 'waiting') return <Navigate to="/esperando" replace />
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()

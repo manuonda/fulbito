@@ -39,15 +39,30 @@ export interface RankingEntry {
   uid: string
   points: number
   position: number
+  disabled: boolean
 }
 
 /**
  * Ranking denso como en la app: 1°, 2°, 2°, 3°...
- * Incluye a todos los miembros aunque tengan 0 puntos.
+ * Incluye a todos los miembros aunque tengan 0 puntos. Los eliminados no
+ * aparecen; los deshabilitados aparecen con 0 puntos (no cuentan mientras
+ * estén pausados, pero sus pronósticos guardados no se pierden).
  */
-export function buildRanking(members: string[], totals: Map<string, number>): RankingEntry[] {
+export function buildRanking(
+  members: string[],
+  totals: Map<string, number>,
+  disabledUids: string[] = [],
+  removedUids: string[] = [],
+): RankingEntry[] {
+  const disabled = new Set(disabledUids)
+  const removed = new Set(removedUids)
   const sorted = members
-    .map((uid) => ({ uid, points: totals.get(uid) ?? 0 }))
+    .filter((uid) => !removed.has(uid))
+    .map((uid) => ({
+      uid,
+      points: disabled.has(uid) ? 0 : (totals.get(uid) ?? 0),
+      disabled: disabled.has(uid),
+    }))
     .sort((a, b) => b.points - a.points)
 
   const entries: RankingEntry[] = []

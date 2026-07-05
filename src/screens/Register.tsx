@@ -18,7 +18,6 @@ export default function Register() {
   const [busy, setBusy] = useState(false)
 
   if (status === 'ready') return <Navigate to={consumeReturnTo('/home')} replace />
-  if (status === 'waiting') return <Navigate to="/esperando" replace />
 
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }))

@@ -1,16 +1,16 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { RequireAdmin, RequireAllowed, RequireAuth } from './components/guards'
+import { RequireAdmin, RequireAuth } from './components/guards'
 import Landing from './screens/Landing'
 import Login from './screens/Login'
 import Register from './screens/Register'
 import ForgotPassword from './screens/ForgotPassword'
-import WaitingInvite from './screens/WaitingInvite'
 import Home from './screens/Home'
 import TournamentRanking from './screens/TournamentRanking'
 import CompleteResults from './screens/CompleteResults'
 import ParticipantDetail from './screens/ParticipantDetail'
 import AdminCreateTournament from './screens/AdminCreateTournament'
 import AdminMatches from './screens/AdminMatches'
+import AdminPlayers from './screens/AdminPlayers'
 import AdminAllowlist from './screens/AdminAllowlist'
 
 export default function App() {
@@ -22,43 +22,35 @@ export default function App() {
         <Route path="/registro" element={<Register />} />
         <Route path="/recuperar" element={<ForgotPassword />} />
         <Route
-          path="/esperando"
-          element={
-            <RequireAuth>
-              <WaitingInvite />
-            </RequireAuth>
-          }
-        />
-        <Route
           path="/home"
           element={
-            <RequireAllowed>
+            <RequireAuth>
               <Home />
-            </RequireAllowed>
+            </RequireAuth>
           }
         />
         <Route
           path="/torneo/:tid"
           element={
-            <RequireAllowed>
+            <RequireAuth>
               <TournamentRanking />
-            </RequireAllowed>
+            </RequireAuth>
           }
         />
         <Route
           path="/torneo/:tid/resultados"
           element={
-            <RequireAllowed>
+            <RequireAuth>
               <CompleteResults />
-            </RequireAllowed>
+            </RequireAuth>
           }
         />
         <Route
           path="/torneo/:tid/participante/:puid"
           element={
-            <RequireAllowed>
+            <RequireAuth>
               <ParticipantDetail />
-            </RequireAllowed>
+            </RequireAuth>
           }
         />
         <Route
@@ -66,6 +58,14 @@ export default function App() {
           element={
             <RequireAdmin>
               <AdminMatches />
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path="/torneo/:tid/jugadores"
+          element={
+            <RequireAdmin>
+              <AdminPlayers />
             </RequireAdmin>
           }
         />

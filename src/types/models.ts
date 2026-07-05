@@ -21,6 +21,10 @@ export interface Tournament {
   porotosPerMember: number
   createdBy: string
   members: string[]
+  /** Pausados temporalmente: no cuentan puntos ni pueden cargar pronósticos. */
+  disabledUids?: string[]
+  /** Sacados del torneo: no aparecen en el ranking; si reabren el link, reaparecen deshabilitados. */
+  removedUids?: string[]
   createdAt: Timestamp | null
 }
 

@@ -15,20 +15,9 @@ service cloud.firestore {
       return isSignedIn() && userEmail() == 'manuonda@gmail.com';
     }
 
-    function isAllowed() {
-      return isSignedIn() && (
-        isAdmin() ||
-        (exists(/databases/$(db)/documents/config/allowlist) &&
-         userEmail() in get(/databases/$(db)/documents/config/allowlist).data.emails)
-      );
-    }
-
-    // Allowlist: cualquier usuario logueado puede leerla (para saber si está
-    // habilitado); solo el admin la modifica.
-    match /config/allowlist {
-      allow read: if isSignedIn();
-      allow write: if isAdmin();
-    }
+    // Acceso abierto: cualquier cuenta logueada puede leer y sumarse a un
+    // torneo abriendo su link. El admin modera después por torneo con
+    // disabledUids/removedUids.
 
     // Perfiles: cada usuario escribe solo el suyo.
     match /users/{uid} {
@@ -39,7 +28,6 @@ service cloud.firestore {
 
     // Índice de usernames únicos: se puede leer sin login (chequeo de
     // disponibilidad en el registro) y solo crear con el propio uid.
-    // "create" ya implica que el doc no existe, así no se pisa uno ajeno.
     match /usernames/{usernameLower} {
       allow read: if true;
       allow create: if isSignedIn()
@@ -48,26 +36,45 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Allowlist global: ya no gatilla el acceso a la app; queda como
+    // herramienta opcional del admin (pantalla /admin/invitaciones).
+    match /config/allowlist {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
     match /tournaments/{tid} {
-      allow read: if isAllowed();
+      allow read: if isSignedIn();
       allow create, delete: if isAdmin();
-      // El admin edita todo (incluido sacar a alguien de members); un usuario
-      // habilitado solo puede sumarse a sí mismo (al entrar por el link).
-      allow update: if isAdmin() || (
-        isAllowed()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members'])
-        && request.resource.data.members.hasAll(resource.data.members)
-        && request.resource.data.members.removeAll(resource.data.members).hasOnly([request.auth.uid])
-      );
+
+      // Primera vez que alguien abre el link: se agrega a sí mismo a members.
+      function selfJoinNew() {
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members'])
+          && request.resource.data.members.hasAll(resource.data.members)
+          && request.resource.data.members.removeAll(resource.data.members).hasOnly([request.auth.uid]);
+      }
+
+      // Alguien eliminado vuelve a abrir el link: pasa de removedUids a
+      // disabledUids por sí mismo (no puede auto-habilitarse).
+      function selfReactivateFromRemoved() {
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disabledUids', 'removedUids'])
+          && request.auth.uid in resource.data.get('removedUids', [])
+          && request.resource.data.get('removedUids', []) == resource.data.get('removedUids', []).removeAll([request.auth.uid])
+          && request.resource.data.get('disabledUids', []).hasAll(resource.data.get('disabledUids', []))
+          && request.resource.data.get('disabledUids', []).removeAll(resource.data.get('disabledUids', [])).hasOnly([request.auth.uid]);
+      }
+
+      allow update: if isAdmin() || selfJoinNew() || selfReactivateFromRemoved();
 
       match /matches/{mid} {
-        allow read: if isAllowed();
+        allow read: if isSignedIn();
         allow write: if isAdmin();
 
-        // Cada usuario escribe solo SU predicción y solo antes del kickoff.
+        // Cada usuario escribe solo SU predicción, antes del kickoff, y
+        // solo si no está deshabilitado/eliminado en este torneo.
         match /predictions/{uid} {
-          allow read: if isAllowed();
-          allow create, update: if isAllowed()
+          allow read: if isSignedIn();
+          allow create, update: if isSignedIn()
             && request.auth.uid == uid
             && request.resource.data.uid == uid
             && request.resource.data.tournamentId == tid
@@ -76,7 +83,9 @@ service cloud.firestore {
             && request.resource.data.scoreB is int
             && request.resource.data.scoreA >= 0
             && request.resource.data.scoreB >= 0
-            && request.time < get(/databases/$(db)/documents/tournaments/$(tid)/matches/$(mid)).data.kickoff;
+            && request.time < get(/databases/$(db)/documents/tournaments/$(tid)/matches/$(mid)).data.kickoff
+            && !(uid in get(/databases/$(db)/documents/tournaments/$(tid)).data.get('disabledUids', []))
+            && !(uid in get(/databases/$(db)/documents/tournaments/$(tid)).data.get('removedUids', []));
           // Solo el admin puede borrar un pronóstico puntual (limpieza manual).
           allow delete: if isAdmin();
         }
@@ -85,7 +94,7 @@ service cloud.firestore {
 
     // Lectura por collection group (ranking del torneo).
     match /{path=**}/predictions/{uid} {
-      allow read: if isAllowed();
+      allow read: if isSignedIn();
     }
   }
 }
