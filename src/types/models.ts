@@ -20,6 +20,8 @@ export interface Tournament {
   type: TournamentType
   porotosPerMember: number
   createdBy: string
+  /** false mientras el organizador arma el torneo: nadie puede inscribirse todavía. */
+  published?: boolean
   members: string[]
   /** Pausados temporalmente: no cuentan puntos ni pueden cargar pronósticos. */
   disabledUids?: string[]

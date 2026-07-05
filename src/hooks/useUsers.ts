@@ -33,3 +33,7 @@ export function userLabel(uid: string, users: Record<string, UserDoc>): string {
   if (!u) return 'Jugador'
   return u.displayName || u.username || u.email
 }
+
+export function userEmail(uid: string, users: Record<string, UserDoc>): string | null {
+  return users[uid]?.email ?? null
+}

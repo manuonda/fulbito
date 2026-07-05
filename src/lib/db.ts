@@ -24,12 +24,25 @@ export async function createTournament(input: {
     type: input.type,
     porotosPerMember: input.type === 'porotos' ? input.porotosPerMember : 0,
     createdBy: input.createdBy,
+    published: false,
     members: [input.createdBy],
     disabledUids: [],
     removedUids: [],
     createdAt: serverTimestamp(),
   })
   return ref.id
+}
+
+export function updateTournament(
+  tid: string,
+  input: { name: string; type: TournamentType; porotosPerMember: number; published: boolean },
+) {
+  return updateDoc(doc(db, 'tournaments', tid), {
+    name: input.name.trim(),
+    type: input.type,
+    porotosPerMember: input.type === 'porotos' ? input.porotosPerMember : 0,
+    published: input.published,
+  })
 }
 
 /** Primera vez que alguien abre el link del torneo: se suma habilitado. */

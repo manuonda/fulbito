@@ -14,6 +14,8 @@ export default function Home() {
   const firstName =
     profile?.firstName || profile?.displayName?.split(' ')[0] || user?.displayName?.split(' ')[0] || ''
 
+  const visibleTournaments = tournaments?.filter((t) => isAdmin || (t.published ?? true))
+
   return (
     <div className="min-h-dvh bg-white pb-10">
       <header className="flex items-center justify-between px-5 pt-6">
@@ -42,9 +44,9 @@ export default function Home() {
       )}
 
       <div className="flex flex-col gap-3 px-5 pt-5">
-        {tournaments === null ? (
+        {visibleTournaments === undefined ? (
           <FullLoader />
-        ) : tournaments.length === 0 ? (
+        ) : visibleTournaments.length === 0 ? (
           <EmptyState
             icon="🏆"
             title="Todavía no hay torneos"
@@ -55,7 +57,7 @@ export default function Home() {
             }
           />
         ) : (
-          tournaments.map((t) => (
+          visibleTournaments.map((t) => (
             <Link
               key={t.id}
               to={`/torneo/${t.id}`}
@@ -63,7 +65,14 @@ export default function Home() {
             >
               <img src={trophy} alt="" className="h-14 w-14" />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-base font-bold">{t.name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="truncate text-base font-bold">{t.name}</p>
+                  {!(t.published ?? true) && (
+                    <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-black text-amber-700">
+                      BORRADOR
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-gray-500">
                   {t.type === 'porotos'
                     ? `${fmt(t.porotosPerMember)} porotos por integrante`

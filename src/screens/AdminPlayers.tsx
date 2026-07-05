@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTournament } from '../hooks/useTournaments'
-import { useUsersMap, userLabel } from '../hooks/useUsers'
+import { useUsersMap, userEmail, userLabel } from '../hooks/useUsers'
 import { disablePlayer, enablePlayer, removePlayer } from '../lib/db'
 import { EmptyState, FullLoader, TopBar } from '../components/ui'
 
@@ -62,6 +62,9 @@ export default function AdminPlayers() {
               <p className="truncate text-[15px] font-semibold text-gray-900">
                 {userLabel(uid, users)}
               </p>
+              {userEmail(uid, users) && (
+                <p className="truncate text-xs text-gray-500">{userEmail(uid, users)}</p>
+              )}
               <span
                 className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-xs font-bold ${STATUS_STYLE[status]}`}
               >

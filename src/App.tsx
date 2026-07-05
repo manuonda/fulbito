@@ -70,6 +70,14 @@ export default function App() {
           }
         />
         <Route
+          path="/torneo/:tid/editar"
+          element={
+            <RequireAdmin>
+              <AdminCreateTournament />
+            </RequireAdmin>
+          }
+        />
+        <Route
           path="/admin/crear-torneo"
           element={
             <RequireAdmin>

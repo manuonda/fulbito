@@ -48,8 +48,11 @@ service cloud.firestore {
       allow create, delete: if isAdmin();
 
       // Primera vez que alguien abre el link: se agrega a sí mismo a members.
+      // Solo si el torneo ya está publicado (si no existe el campo, se
+      // asume publicado para no romper torneos creados antes de esta regla).
       function selfJoinNew() {
-        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members'])
+        return resource.data.get('published', true) == true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members'])
           && request.resource.data.members.hasAll(resource.data.members)
           && request.resource.data.members.removeAll(resource.data.members).hasOnly([request.auth.uid]);
       }
@@ -57,7 +60,8 @@ service cloud.firestore {
       // Alguien eliminado vuelve a abrir el link: pasa de removedUids a
       // disabledUids por sí mismo (no puede auto-habilitarse).
       function selfReactivateFromRemoved() {
-        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disabledUids', 'removedUids'])
+        return resource.data.get('published', true) == true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disabledUids', 'removedUids'])
           && request.auth.uid in resource.data.get('removedUids', [])
           && request.resource.data.get('removedUids', []) == resource.data.get('removedUids', []).removeAll([request.auth.uid])
           && request.resource.data.get('disabledUids', []).hasAll(resource.data.get('disabledUids', []))

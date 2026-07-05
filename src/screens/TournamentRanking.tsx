@@ -30,15 +30,18 @@ export default function TournamentRanking() {
     )
   }, [tournament, matches, predictions])
 
-  // Cualquiera que abre el link se suma solo, ya habilitado. Si había sido
-  // eliminado y vuelve a entrar, reaparece deshabilitado (no se auto-habilita).
+  // Cualquiera que abre el link de un torneo PUBLICADO se suma solo, ya
+  // habilitado. Si había sido eliminado y vuelve a entrar, reaparece
+  // deshabilitado (no se auto-habilita). Mientras está en borrador, nadie
+  // se suma todavía (salvo el organizador, que ya es miembro desde que lo creó).
   useEffect(() => {
     if (!user || !tid || !tournament) return
+    const isPublished = tournament.published ?? true
     const isMember = tournament.members.includes(user.uid)
     const isRemoved = (tournament.removedUids ?? []).includes(user.uid)
-    if (!isMember) {
+    if (!isMember && isPublished) {
       joinTournament(tid, user.uid).catch(() => {})
-    } else if (isRemoved) {
+    } else if (isMember && isRemoved) {
       reactivateFromRemoved(tid, user.uid).catch(() => {})
     }
   }, [user, tid, tournament])
@@ -53,6 +56,7 @@ export default function TournamentRanking() {
     )
 
   const isMember = !!user && tournament.members.includes(user.uid)
+  const isPublished = tournament.published ?? true
   const accumulated = tournament.porotosPerMember * tournament.members.length
 
   async function handleShare() {
@@ -103,6 +107,19 @@ export default function TournamentRanking() {
           Compartí el ranking ↗
         </button>
       </div>
+
+      {isAdmin && !isPublished && (
+        <div className="mx-5 mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <p className="font-bold">Este torneo está en borrador.</p>
+          <p>
+            Todavía nadie puede inscribirse. Armá los partidos tranquilo y publicalo desde{' '}
+            <Link to={`/torneo/${tid}/editar`} className="font-bold underline">
+              Editar torneo
+            </Link>{' '}
+            cuando esté listo.
+          </p>
+        </div>
+      )}
 
       <div className="mt-6 px-5">
         {predictionsError && (
@@ -175,6 +192,9 @@ export default function TournamentRanking() {
             </Link>
             <Link to={`/torneo/${tid}/jugadores`} className={btnSecondary}>
               Gestionar jugadores
+            </Link>
+            <Link to={`/torneo/${tid}/editar`} className={btnSecondary}>
+              Editar torneo
             </Link>
           </>
         )}
