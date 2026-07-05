@@ -3,7 +3,7 @@ import { useAuthStore } from '../store/authStore'
 import { useTournaments } from '../hooks/useTournaments'
 import { signOutUser } from '../lib/auth'
 import { EmptyState, FullLoader, fmt } from '../components/ui'
-import trophy from '../assets/trophy.svg'
+import trophy from '../assets/trophy-cup.webp'
 
 export default function Home() {
   const isAdmin = useAuthStore((s) => s.isAdmin)
@@ -63,7 +63,7 @@ export default function Home() {
               to={`/torneo/${t.id}`}
               className="flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition active:bg-gray-50"
             >
-              <img src={trophy} alt="" className="h-14 w-14" />
+              <img src={trophy} alt="" className="h-14 w-14 shrink-0 object-contain" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <p className="truncate text-base font-bold">{t.name}</p>

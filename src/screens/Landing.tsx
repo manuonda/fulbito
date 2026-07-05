@@ -5,7 +5,7 @@ import { authErrorMessage, signInWithGoogle } from '../lib/auth'
 import { consumeReturnTo } from '../lib/returnTo'
 import { ErrorText } from '../components/ui'
 import { isFirebaseConfigured } from '../lib/firebase'
-import trophy from '../assets/trophy.svg'
+import trophy from '../assets/trophy-cup.webp'
 
 function GoogleIcon() {
   return (
@@ -42,7 +42,7 @@ export default function Landing() {
       {/* Hero */}
       <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-indigo-700 via-indigo-600 to-violet-700 px-6 pb-16 pt-14 text-white">
         <div className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-white/10 blur-3xl" />
-        <img src={trophy} alt="" className="h-40 w-40 drop-shadow-xl" />
+        <img src={trophy} alt="Copa fulbito" className="h-48 w-auto drop-shadow-2xl" />
         <h1 className="mt-4 text-5xl font-black lowercase tracking-tight">fulbito</h1>
         <p className="mt-2 rounded-full bg-white/15 px-4 py-1.5 text-sm font-semibold tracking-wide">
           ⚽ Torneo Mundial 2026

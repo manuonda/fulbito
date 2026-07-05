@@ -5,7 +5,7 @@ import { useTournament } from '../hooks/useTournaments'
 import { createTournament, updateTournament } from '../lib/db'
 import { ErrorText, FullLoader, TopBar, btnPrimary, inputBase } from '../components/ui'
 import type { TournamentType } from '../types/models'
-import trophy from '../assets/trophy.svg'
+import trophy from '../assets/trophy-cup.webp'
 
 export default function AdminCreateTournament() {
   const { tid } = useParams()
@@ -75,7 +75,7 @@ export default function AdminCreateTournament() {
         backTo={isEdit ? `/torneo/${tid}` : '/home'}
       />
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-5 pt-2">
-        <img src={trophy} alt="" className="mx-auto h-32 w-32" />
+        <img src={trophy} alt="" className="mx-auto h-36 w-auto" />
 
         {!isEdit && (
           <div className="flex items-start gap-3 rounded-2xl bg-indigo-50 px-4 py-3.5">

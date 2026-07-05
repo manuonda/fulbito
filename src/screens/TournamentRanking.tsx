@@ -8,7 +8,7 @@ import { useUsersMap, userLabel } from '../hooks/useUsers'
 import { buildRanking, computeTotals } from '../lib/scoring'
 import { joinTournament, reactivateFromRemoved } from '../lib/db'
 import { EmptyState, FullLoader, TopBar, btnPrimary, btnSecondary, fmt } from '../components/ui'
-import trophy from '../assets/trophy.svg'
+import trophy from '../assets/trophy-cup.webp'
 
 export default function TournamentRanking() {
   const { tid } = useParams()
@@ -87,7 +87,7 @@ export default function TournamentRanking() {
 
       <div className="flex flex-col items-center px-5 text-center">
         <h1 className="text-2xl font-black">{tournament.name}</h1>
-        <img src={trophy} alt="" className="mt-2 h-24 w-24" />
+        <img src={trophy} alt="Copa del torneo" className="mt-2 h-28 w-auto drop-shadow-lg" />
         {tournament.type === 'porotos' ? (
           <>
             <p className="mt-1 text-3xl font-black">{fmt(tournament.porotosPerMember)}</p>
