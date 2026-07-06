@@ -13,6 +13,8 @@ import AdminMatches from './screens/AdminMatches'
 import AdminPlayers from './screens/AdminPlayers'
 import AdminAllowlist from './screens/AdminAllowlist'
 
+
+// Ruta protegida para el torneo
 export default function App() {
   return (
     <div className="mx-auto min-h-dvh w-full max-w-md bg-white shadow-xl">
