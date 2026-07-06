@@ -15,6 +15,11 @@ service cloud.firestore {
       return isSignedIn() && userEmail() == 'manuonda@gmail.com';
     }
 
+    function isOrganizer(tid) {
+      return isSignedIn()
+        && get(/databases/$(db)/documents/tournaments/$(tid)).data.createdBy == request.auth.uid;
+    }
+
     // Acceso abierto: cualquier cuenta logueada puede leer y sumarse a un
     // torneo abriendo su link. El admin modera después por torneo con
     // disabledUids/removedUids.
@@ -45,7 +50,8 @@ service cloud.firestore {
 
     match /tournaments/{tid} {
       allow read: if isSignedIn();
-      allow create, delete: if isAdmin();
+      allow create: if isSignedIn() && request.resource.data.createdBy == request.auth.uid;
+      allow delete: if isAdmin() || isOrganizer(tid);
 
       // Primera vez que alguien abre el link: se agrega a sí mismo a members.
       // Solo si el torneo ya está publicado (si no existe el campo, se
@@ -68,11 +74,11 @@ service cloud.firestore {
           && request.resource.data.get('disabledUids', []).removeAll(resource.data.get('disabledUids', [])).hasOnly([request.auth.uid]);
       }
 
-      allow update: if isAdmin() || selfJoinNew() || selfReactivateFromRemoved();
+      allow update: if isAdmin() || isOrganizer(tid) || selfJoinNew() || selfReactivateFromRemoved();
 
       match /matches/{mid} {
         allow read: if isSignedIn();
-        allow write: if isAdmin();
+        allow write: if isAdmin() || isOrganizer(tid);
 
         // Cada usuario escribe solo SU predicción, antes del kickoff, y
         // solo si no está deshabilitado/eliminado en este torneo.
@@ -90,8 +96,8 @@ service cloud.firestore {
             && request.time < get(/databases/$(db)/documents/tournaments/$(tid)/matches/$(mid)).data.kickoff
             && !(uid in get(/databases/$(db)/documents/tournaments/$(tid)).data.get('disabledUids', []))
             && !(uid in get(/databases/$(db)/documents/tournaments/$(tid)).data.get('removedUids', []));
-          // Solo el admin puede borrar un pronóstico puntual (limpieza manual).
-          allow delete: if isAdmin();
+          // Solo el admin o el organizador del torneo puede borrar un pronóstico puntual (limpieza manual).
+          allow delete: if isAdmin() || isOrganizer(tid);
         }
       }
     }

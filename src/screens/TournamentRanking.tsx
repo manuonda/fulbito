@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { isOrganizerOf } from '../config/roles'
 import { useTournament } from '../hooks/useTournaments'
 import { useMatches } from '../hooks/useMatches'
 import { useTournamentPredictions } from '../hooks/usePredictions'
@@ -57,6 +58,7 @@ export default function TournamentRanking() {
 
   const isMember = !!user && tournament.members.includes(user.uid)
   const isPublished = tournament.published ?? true
+  const canManage = isAdmin || isOrganizerOf(tournament, user?.uid)
   // Solo cuentan los integrantes habilitados (ranking ya excluye
   // deshabilitados/eliminados); mientras carga se usa 0 para no mostrar un
   // número inflado con gente que no cuenta.
@@ -77,7 +79,7 @@ export default function TournamentRanking() {
       <TopBar
         backTo="/home"
         right={
-          isAdmin ? (
+          user ? (
             <Link
               to="/admin/crear-torneo"
               className="rounded-2xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white active:bg-indigo-700"
@@ -111,7 +113,7 @@ export default function TournamentRanking() {
         </button>
       </div>
 
-      {isAdmin && !isPublished && (
+      {canManage && !isPublished && (
         <div className="mx-5 mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
           <p className="font-bold">Este torneo está en borrador.</p>
           <p>
@@ -182,7 +184,7 @@ export default function TournamentRanking() {
       </div>
 
       <div className="flex flex-col gap-3 px-5 pt-4">
-        {isAdmin && (
+        {canManage && (
           <>
             <button type="button" onClick={handleShare} className={btnPrimary}>
               Invitar

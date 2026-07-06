@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { RequireAdmin, RequireAuth } from './components/guards'
+import { RequireAdmin, RequireAuth, RequireOrganizer } from './components/guards'
 import Landing from './screens/Landing'
 import Login from './screens/Login'
 import Register from './screens/Register'
@@ -56,33 +56,33 @@ export default function App() {
         <Route
           path="/torneo/:tid/partidos"
           element={
-            <RequireAdmin>
+            <RequireOrganizer>
               <AdminMatches />
-            </RequireAdmin>
+            </RequireOrganizer>
           }
         />
         <Route
           path="/torneo/:tid/jugadores"
           element={
-            <RequireAdmin>
+            <RequireOrganizer>
               <AdminPlayers />
-            </RequireAdmin>
+            </RequireOrganizer>
           }
         />
         <Route
           path="/torneo/:tid/editar"
           element={
-            <RequireAdmin>
+            <RequireOrganizer>
               <AdminCreateTournament />
-            </RequireAdmin>
+            </RequireOrganizer>
           }
         />
         <Route
           path="/admin/crear-torneo"
           element={
-            <RequireAdmin>
+            <RequireAuth>
               <AdminCreateTournament />
-            </RequireAdmin>
+            </RequireAuth>
           }
         />
         <Route

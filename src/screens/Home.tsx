@@ -14,7 +14,9 @@ export default function Home() {
   const firstName =
     profile?.firstName || profile?.displayName?.split(' ')[0] || user?.displayName?.split(' ')[0] || ''
 
-  const visibleTournaments = tournaments?.filter((t) => isAdmin || (t.published ?? true))
+  const visibleTournaments = tournaments?.filter(
+    (t) => isAdmin || t.createdBy === user?.uid || (t.published ?? true),
+  )
 
   return (
     <div className="min-h-dvh bg-white pb-10">
@@ -32,16 +34,14 @@ export default function Home() {
         </button>
       </header>
 
-      {isAdmin && (
-        <div className="px-5 pt-4">
-          <Link
-            to="/admin/crear-torneo"
-            className="block rounded-2xl bg-indigo-600 px-4 py-3 text-center text-sm font-bold text-white active:bg-indigo-700"
-          >
-            Crear nuevo torneo
-          </Link>
-        </div>
-      )}
+      <div className="px-5 pt-4">
+        <Link
+          to="/admin/crear-torneo"
+          className="block rounded-2xl bg-indigo-600 px-4 py-3 text-center text-sm font-bold text-white active:bg-indigo-700"
+        >
+          Crear nuevo torneo
+        </Link>
+      </div>
 
       <div className="flex flex-col gap-3 px-5 pt-5">
         {visibleTournaments === undefined ? (
@@ -50,11 +50,7 @@ export default function Home() {
           <EmptyState
             icon="🏆"
             title="Todavía no hay torneos"
-            subtitle={
-              isAdmin
-                ? 'Creá el primero con el botón de arriba.'
-                : 'Cuando el organizador cree un torneo lo vas a ver acá.'
-            }
+            subtitle="Creá el primero con el botón de arriba."
           />
         ) : (
           visibleTournaments.map((t) => (

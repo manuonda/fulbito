@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { isOrganizerOf } from '../config/roles'
 import { useTournament } from '../hooks/useTournaments'
 import { useMatches } from '../hooks/useMatches'
 import { usePredictionsByMatch, useTournamentPredictions } from '../hooks/usePredictions'
@@ -38,6 +39,7 @@ export default function ParticipantDetail() {
 
   if (!tournament || rows === null) return <FullLoader />
 
+  const canManage = isAdmin || isOrganizerOf(tournament, me?.uid)
   const total = rows.reduce((acc, r) => acc + (r.points ?? 0), 0)
   const hiddenCount = (matches?.length ?? 0) - rows.length
 
@@ -67,7 +69,7 @@ export default function ParticipantDetail() {
       <div className="flex flex-col items-center pt-2">
         <p className="text-4xl font-black">{total}</p>
         <p className="text-sm text-gray-500">porotos en {tournament.name}</p>
-        {isAdmin && !isSelf && (
+        {canManage && !isSelf && (
           <button
             type="button"
             onClick={handleRemoveMember}
@@ -131,7 +133,7 @@ export default function ParticipantDetail() {
                   +{points}
                 </span>
               )}
-              {isAdmin && pred && (
+              {canManage && pred && (
                 <button
                   type="button"
                   onClick={() => handleDeletePrediction(m.id)}
