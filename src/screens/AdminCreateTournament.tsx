@@ -5,7 +5,6 @@ import { useTournament } from '../hooks/useTournaments'
 import { createTournament, updateTournament } from '../lib/db'
 import { ErrorText, FullLoader, TopBar, btnPrimary, inputBase } from '../components/ui'
 import type { TournamentType } from '../types/models'
-import trophy from '../assets/trophy-cup.webp'
 
 export default function AdminCreateTournament() {
   const { tid } = useParams()
@@ -71,11 +70,13 @@ export default function AdminCreateTournament() {
   return (
     <div className="min-h-dvh bg-white pb-10">
       <TopBar
-        title={isEdit ? 'Editar torneo' : 'Crear torneo desde 16vos'}
+        title={isEdit ? 'Editar torneo' : 'Crear torneo'}
         backTo={isEdit ? `/torneo/${tid}` : '/home'}
       />
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-5 pt-2">
-        <img src={trophy} alt="" className="mx-auto h-36 w-auto" />
+        <span className="mx-auto text-7xl" role="img" aria-label="Pelota de fútbol">
+          ⚽
+        </span>
 
         {!isEdit && (
           <div className="flex items-start gap-3 rounded-2xl bg-indigo-50 px-4 py-3.5">
@@ -86,9 +87,8 @@ export default function AdminCreateTournament() {
               </svg>
             </span>
             <p className="text-sm text-gray-800">
-              El torneo empieza en 16vos y los puntos se acumulan desde esa fase. Arranca en
-              borrador: armá los partidos tranquilo y publicalo cuando esté listo para que se
-              inscriban.
+              Armá los partidos tranquilo y publicalo cuando esté listo para que la gente se
+              inscriba. Arranca en borrador hasta que lo publiques.
             </p>
           </div>
         )}
