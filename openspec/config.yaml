@@ -1,0 +1,71 @@
+schema: spec-driven
+project: fulbito
+created: 2026-07-06
+
+context: |
+  **Project**: Fulbito — Mobile-first World Cup 2026 tournament prediction app
+
+  **Tech Stack**:
+  - Build: Vite 8.1.1 (React plugin)
+  - Frontend: React 19.2.7 + TypeScript 6.0.2
+  - Routing: React Router 7.18.1
+  - Styling: Tailwind CSS 4.3.2 (with Vite integration)
+  - State: Zustand 5.0.14
+  - Backend: Firebase 12.15.0 (Auth + Firestore)
+  - Linter: oxlint 1.71.0 (Rust-based, no eslint)
+  - Type Checking: TypeScript (tsc)
+
+  **Architecture**:
+  - Screen-based UI (one screen per route, /screens/)
+  - Custom React hooks for Firestore data fetching (onSnapshot listeners)
+  - Zustand store for auth session + allowlist
+  - Firebase Firestore security rules-based role control (admin only)
+  - Tailwind atomic/utility-first CSS
+
+  **Testing**: NONE CONFIGURED — no vitest, jest, mocha, or similar
+  - Strict TDD mode: disabled
+  - Type safety enforced via TypeScript only
+  - Linting via oxlint
+
+  **Key Domains**:
+  - Authentication (Google OAuth + Email/Password)
+  - Tournament & Match management
+  - Prediction submission & scoring
+  - Ranking calculation (dense ranking, 6-3-0 points)
+  - Allowlist / invitation system
+
+rules:
+  proposal:
+    - Include rollback plan for all features
+    - Identify permission/security implications (Firebase rules, admin checks)
+  specs:
+    - Use Given/When/Then for prediction/scoring scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+    - Firestore structure requirements MUST be explicit
+  design:
+    - Map React component hierarchy (screens, hooks, stores)
+    - Document Firestore collection changes
+    - Show TypeScript type changes (interfaces, enums)
+  tasks:
+    - Group by feature/screen; use hierarchical numbering
+    - Keep tasks completable in one session
+    - Include type definitions and hook tests (manual QA only)
+  apply:
+    - Follow existing component & hook patterns
+    - All new code MUST be TypeScript (no .js)
+    - Run `npm run build && npm run lint` before PR
+    tdd: false
+    test_command: ""
+  verify:
+    - No automated test runner (manual QA only)
+    - Verify TypeScript compilation (tsc -b)
+    - Verify linting (oxlint)
+    build_command: "npm run build"
+    lint_command: "npm run lint"
+    type_check_command: "npm run build"
+  archive:
+    - Warn before merging destructive deltas to main specs
+    - Preserve migration notes for data model changes
+
+delivery_strategy: ask-on-risk
+artifact_store: openspec
