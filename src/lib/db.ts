@@ -5,6 +5,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  runTransaction,
   serverTimestamp,
   setDoc,
   Timestamp,
@@ -13,24 +14,38 @@ import {
 import { db } from './firebase'
 import type { Phase, Team, TournamentType } from '../types/models'
 
+/** MVP: gancho de monetización futura ("¿querés un torneo más? pagá"). */
+export const MAX_TOURNAMENTS_PER_USER = 3
+export const MAX_MEMBERS_PER_TOURNAMENT = 10
+
 export async function createTournament(input: {
   name: string
   type: TournamentType
   porotosPerMember: number
   createdBy: string
 }) {
-  const ref = await addDoc(collection(db, 'tournaments'), {
-    name: input.name.trim(),
-    type: input.type,
-    porotosPerMember: input.type === 'porotos' ? input.porotosPerMember : 0,
-    createdBy: input.createdBy,
-    published: false,
-    members: [input.createdBy],
-    disabledUids: [],
-    removedUids: [],
-    createdAt: serverTimestamp(),
+  const userRef = doc(db, 'users', input.createdBy)
+  const tournamentRef = doc(collection(db, 'tournaments'))
+  await runTransaction(db, async (tx) => {
+    const userSnap = await tx.get(userRef)
+    const tournamentsCreated = (userSnap.data()?.tournamentsCreated as number | undefined) ?? 0
+    if (tournamentsCreated >= MAX_TOURNAMENTS_PER_USER) {
+      throw new Error('TOURNAMENT_LIMIT_REACHED')
+    }
+    tx.set(tournamentRef, {
+      name: input.name.trim(),
+      type: input.type,
+      porotosPerMember: input.type === 'porotos' ? input.porotosPerMember : 0,
+      createdBy: input.createdBy,
+      published: false,
+      members: [input.createdBy],
+      disabledUids: [],
+      removedUids: [],
+      createdAt: serverTimestamp(),
+    })
+    tx.set(userRef, { tournamentsCreated: tournamentsCreated + 1 }, { merge: true })
   })
-  return ref.id
+  return tournamentRef.id
 }
 
 export function updateTournament(
