@@ -50,17 +50,23 @@ service cloud.firestore {
 
     match /tournaments/{tid} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn() && request.resource.data.createdBy == request.auth.uid;
+      // Tope de MAX_TOURNAMENTS_PER_USER (3) torneos creados por usuario;
+      // el contador vive en users/{uid}.tournamentsCreated (ver src/lib/db.ts).
+      allow create: if isSignedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && get(/databases/$(db)/documents/users/$(request.auth.uid)).data.get('tournamentsCreated', 0) < 3;
       allow delete: if isAdmin() || isOrganizer(tid);
 
       // Primera vez que alguien abre el link: se agrega a sí mismo a members.
       // Solo si el torneo ya está publicado (si no existe el campo, se
-      // asume publicado para no romper torneos creados antes de esta regla).
+      // asume publicado para no romper torneos creados antes de esta regla)
+      // y todavía hay lugar (tope MAX_MEMBERS_PER_TOURNAMENT = 10).
       function selfJoinNew() {
         return resource.data.get('published', true) == true
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members'])
           && request.resource.data.members.hasAll(resource.data.members)
-          && request.resource.data.members.removeAll(resource.data.members).hasOnly([request.auth.uid]);
+          && request.resource.data.members.removeAll(resource.data.members).hasOnly([request.auth.uid])
+          && request.resource.data.members.size() <= 10;
       }
 
       // Alguien eliminado vuelve a abrir el link: pasa de removedUids a
