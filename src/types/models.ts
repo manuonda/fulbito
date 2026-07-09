@@ -10,6 +10,8 @@ export interface UserDoc {
   displayName: string
   photoURL?: string | null
   provider: Provider
+  /** Cantidad de torneos creados por este usuario (tope: MAX_TOURNAMENTS_PER_USER). */
+  tournamentsCreated?: number
 }
 
 export type TournamentType = 'amistoso' | 'porotos'
