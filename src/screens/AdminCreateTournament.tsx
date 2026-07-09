@@ -1,9 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
-import { useTournament } from '../hooks/useTournaments'
-import { createTournament, updateTournament } from '../lib/db'
-import { ErrorText, FullLoader, TopBar, btnPrimary, inputBase } from '../components/ui'
+import { useTournament, useTournaments } from '../hooks/useTournaments'
+import { createTournament, updateTournament, MAX_TOURNAMENTS_PER_USER } from '../lib/db'
+import { EmptyState, ErrorText, FullLoader, TopBar, btnPrimary, inputBase } from '../components/ui'
 import type { TournamentType } from '../types/models'
 
 export default function AdminCreateTournament() {
@@ -12,6 +12,9 @@ export default function AdminCreateTournament() {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
   const existing = useTournament(tid)
+  const allTournaments = useTournaments()
+  const myTournamentsCount = allTournaments?.filter((t) => t.createdBy === user?.uid).length ?? 0
+  const limitReached = !isEdit && myTournamentsCount >= MAX_TOURNAMENTS_PER_USER
 
   const [name, setName] = useState('')
   const [type, setType] = useState<TournamentType>('porotos')
@@ -32,6 +35,19 @@ export default function AdminCreateTournament() {
   }, [isEdit, existing, prefilled])
 
   if (isEdit && existing === undefined) return <FullLoader />
+
+  if (limitReached) {
+    return (
+      <div className="min-h-dvh bg-white pb-10">
+        <TopBar title="Crear torneo" backTo="/home" />
+        <EmptyState
+          icon="🚫"
+          title={`Llegaste al límite de ${MAX_TOURNAMENTS_PER_USER} torneos`}
+          subtitle="Por ahora cada usuario puede crear hasta 3 torneos. Terminá o borrá alguno para crear uno nuevo."
+        />
+      </div>
+    )
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -56,8 +72,12 @@ export default function AdminCreateTournament() {
         })
         navigate(`/torneo/${newTid}/partidos`, { replace: true })
       }
-    } catch {
-      setError('No se pudo guardar. Probá de nuevo.')
+    } catch (err) {
+      if (err instanceof Error && err.message === 'TOURNAMENT_LIMIT_REACHED') {
+        setError(`Llegaste al límite de ${MAX_TOURNAMENTS_PER_USER} torneos por usuario.`)
+      } else {
+        setError('No se pudo guardar. Probá de nuevo.')
+      }
       setBusy(false)
     }
   }
