@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { isOrganizerOf } from '../config/roles'
@@ -7,7 +7,7 @@ import { useMatches } from '../hooks/useMatches'
 import { useTournamentPredictions } from '../hooks/usePredictions'
 import { useUsersMap, userLabel } from '../hooks/useUsers'
 import { buildRanking, computeTotals } from '../lib/scoring'
-import { joinTournament, reactivateFromRemoved } from '../lib/db'
+import { joinTournament, reactivateFromRemoved, MAX_MEMBERS_PER_TOURNAMENT } from '../lib/db'
 import { EmptyState, FullLoader, TopBar, btnPrimary, btnSecondary, fmt } from '../components/ui'
 import trophy from '../assets/trophy-cup.webp'
 
@@ -20,6 +20,7 @@ export default function TournamentRanking() {
   const matches = useMatches(tid)
   const { predictions, error: predictionsError } = useTournamentPredictions(tid)
   const users = useUsersMap(tournament?.members)
+  const [joinError, setJoinError] = useState<'full' | null>(null)
 
   const ranking = useMemo(() => {
     if (!tournament || !matches || !predictions) return null
@@ -41,7 +42,9 @@ export default function TournamentRanking() {
     const isMember = tournament.members.includes(user.uid)
     const isRemoved = (tournament.removedUids ?? []).includes(user.uid)
     if (!isMember && isPublished) {
-      joinTournament(tid, user.uid).catch(() => {})
+      joinTournament(tid, user.uid).catch((err) => {
+        if (err instanceof Error && err.message === 'TOURNAMENT_FULL') setJoinError('full')
+      })
     } else if (isMember && isRemoved) {
       reactivateFromRemoved(tid, user.uid).catch(() => {})
     }
@@ -112,6 +115,13 @@ export default function TournamentRanking() {
           Compartí el ranking ↗
         </button>
       </div>
+
+      {joinError === 'full' && (
+        <div className="mx-5 mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <p className="font-bold">Este torneo ya está lleno.</p>
+          <p>Llegó al máximo de {MAX_MEMBERS_PER_TOURNAMENT} integrantes.</p>
+        </div>
+      )}
 
       {canManage && !isPublished && (
         <div className="mx-5 mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
