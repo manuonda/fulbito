@@ -60,9 +60,19 @@ export function updateTournament(
   })
 }
 
-/** Primera vez que alguien abre el link del torneo: se suma habilitado. */
-export function joinTournament(tid: string, uid: string) {
-  return updateDoc(doc(db, 'tournaments', tid), { members: arrayUnion(uid) })
+/** Primera vez que alguien abre el link del torneo: se suma habilitado (si hay lugar). */
+export async function joinTournament(tid: string, uid: string) {
+  const ref = doc(db, 'tournaments', tid)
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref)
+    if (!snap.exists()) return
+    const members: string[] = snap.data().members ?? []
+    if (members.includes(uid)) return
+    if (members.length >= MAX_MEMBERS_PER_TOURNAMENT) {
+      throw new Error('TOURNAMENT_FULL')
+    }
+    tx.update(ref, { members: [...members, uid] })
+  })
 }
 
 /**
